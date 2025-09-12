@@ -1,0 +1,126 @@
+/**
+ * Menú del bot
+ *
+ * @author Dev Ewin
+ */
+const { BOT_NAME, PREFIX } = require("./config");
+const packageInfo = require("../package.json");
+const { readMore } = require("./utils");
+
+exports.menuMessage = () => {
+  const date = new Date();
+
+  return `╭━━⪩ ¡BIENVENIDO! ⪨━━${readMore()}
+▢
+▢ • ${BOT_NAME}
+▢ • Fecha: ${date.toLocaleDateString("es-es")}
+▢ • Hora: ${date.toLocaleTimeString("es-es")}
+▢ • Prefijo: ${PREFIX}
+▢ • Versión: ${packageInfo.version}
+▢
+╰━━─「🪐」─━━
+
+╭━━⪩ ADMINS ⪨━━
+▢
+▢ • ${PREFIX}anti-audio (1/0)
+▢ • ${PREFIX}anti-documentos (1/0)
+▢ • ${PREFIX}anti-event (1/0)
+▢ • ${PREFIX}anti-image (1/0)
+▢ • ${PREFIX}anti-link (1/0)
+▢ • ${PREFIX}anti-product (1/0)
+▢ • ${PREFIX}anti-sticker (1/0)
+▢ • ${PREFIX}anti-video (1/0)
+▢ • ${PREFIX}auto-responder (1/0)
+▢ • ${PREFIX}ban
+▢ • ${PREFIX}add
+▢ • ${PREFIX}clear
+▢ • ${PREFIX}cerrar
+▢ • ${PREFIX}delete
+▢ • ${PREFIX}banadmin
+▢ • ${PREFIX}exit (1/0)
+▢ • ${PREFIX}todos
+▢ • ${PREFIX}link-group
+▢ • ${PREFIX}mute
+▢ • ${PREFIX}only-admin (1/0)
+▢ • ${PREFIX}open
+▢ • ${PREFIX}add-admin
+▢ • ${PREFIX}reveal
+▢ • ${PREFIX}schedule-message
+▢ • ${PREFIX}unmute
+▢ • ${PREFIX}welcome (1/0)
+▢
+╰━━─「⭐」─━━
+
+╭━━⪩ PRINCIPAL ⪨━━
+▢
+▢ • ${PREFIX}attp / sticker-texto
+▢ • ${PREFIX}cita-falsa
+▢ • ${PREFIX}generar-link
+▢ • ${PREFIX}obtener-lid
+▢ • ${PREFIX}google-search
+▢ • ${PREFIX}profile
+▢ • ${PREFIX}renombrar-sticker
+▢ • ${PREFIX}sticker
+▢ • ${PREFIX}to-image / aimagen
+▢ • ${PREFIX}ttp
+▢
+╰━━─「🚀」─━━`;
+
+};
+/*
+
+╭━━⪩ DESCARGAS ⪨━━
+▢
+▢ • ${PREFIX}play-audio
+▢ • ${PREFIX}play-video
+▢ • ${PREFIX}tik-tok
+▢ • ${PREFIX}yt-mp3
+▢ • ${PREFIX}yt-mp4
+▢
+╰━━─「🎶」─━━
+
+╭━━⪩ JUEGOS ⪨━━
+▢
+▢ • ${PREFIX}abrazar
+▢ • ${PREFIX}besar
+▢ • ${PREFIX}bofetada
+▢ • ${PREFIX}cenar
+▢ • ${PREFIX}dado
+▢ • ${PREFIX}golpear
+▢ • ${PREFIX}luchar
+▢ • ${PREFIX}matar
+▢
+╰━━─「🎡」─━━
+
+╭━━⪩ IA ⪨━━
+▢
+▢ • ${PREFIX}gemini
+▢ • ${PREFIX}ia-sticker
+▢ • ${PREFIX}pixart
+▢ • ${PREFIX}stable-diffusion-turbo
+▢
+╰━━─「🚀」─━━
+
+╭━━⪩ LIENZO ⪨━━
+▢
+▢ • ${PREFIX}blur
+▢ • ${PREFIX}contrast
+▢ • ${PREFIX}gray
+▢ • ${PREFIX}invert
+▢ • ${PREFIX}jail
+▢ • ${PREFIX}mirror
+▢ • ${PREFIX}pixel
+▢ • ${PREFIX}rip
+▢
+╰━━─「❇」─━━`;
+
+//▢ • ${PREFIX}samples-of-messages
+`
+//▢ • ${PREFIX}samples-of-messages
+`
+`
+//▢ • ${PREFIX}yt-search
+`
+*/
+
+
