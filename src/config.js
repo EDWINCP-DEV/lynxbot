@@ -36,11 +36,6 @@ exports.TEMP_DIR = path.resolve(__dirname, "..", "assets", "temp");
 // Tiempo de espera en milisegundos por evento (evita el baneo).
 exports.TIMEOUT_IN_MILLISECONDS_BY_EVENT = 300;
 
-// Plataforma de API's
-exports.SPIDER_API_BASE_URL = "https://api.spiderx.com.br/api";
-
-// Obtén tu token, creando una cuenta en: https://api.spiderx.com.br.
-exports.SPIDER_API_TOKEN = "tu_token_aqui";
 
 // Si deseas responder solo a un grupo específico,
 // coloca su ID en la configuración siguiente.

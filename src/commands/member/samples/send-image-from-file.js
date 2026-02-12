@@ -42,7 +42,7 @@ module.exports = {
     await delay(3000);
 
     await sendImageFromFile(
-      path.join(ASSETS_DIR, "images", "takeshi-bot.png"),
+      path.join(ASSETS_DIR, "images", "lynxbot.png"),
       "¡Logo de Takeshi Bot!"
     );
 
@@ -55,7 +55,7 @@ module.exports = {
     await delay(3000);
 
     await sendImageFromFile(
-      path.join(ASSETS_DIR, "images", "takeshi-bot.png"),
+      path.join(ASSETS_DIR, "images", "lynxbot.png"),
       `¡Logo de Takeshi Bot para ti @${userJid.split("@")[0]}!`,
       [userJid]
     );

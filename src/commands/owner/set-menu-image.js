@@ -28,7 +28,7 @@ module.exports = {
     }
 
     try {
-      const menuImagePath = path.join(ASSETS_DIR, "images", "takeshi-bot.png");
+      const menuImagePath = path.join(ASSETS_DIR, "images", "lynxbot.png");
 
       let backupPath = "";
 
