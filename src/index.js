@@ -1,5 +1,6 @@
 
 const { connect } = require("./connection");
+const { connectDB } = require('./services/databaseService');
 const { load } = require("./loader");
 const { badMacHandler } = require("./utils/badMacHandler");
 const {
@@ -35,6 +36,7 @@ process.on("unhandledRejection", (reason, promise) => {
 });
 
 async function startBot() {
+  await connectDB();
   try {
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
     process.setMaxListeners(1500);
