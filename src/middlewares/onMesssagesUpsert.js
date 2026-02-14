@@ -2,7 +2,7 @@
  * Evento llamado cuando un mensaje
  * es enviado al grupo de WhatsApp
  *
- * @author Dev Gui
+ * @author Dev Gui & Ewin
  */
 const {
   isAtLeastMinutesInPast,
@@ -38,14 +38,22 @@ exports.onMessagesUpsert = async ({ socket, messages, startProcess }) => {
     try {
       const timestamp = webMessage.messageTimestamp;
 
+      // --- 🛡️ FILTRO DE SEGURIDAD (SaaS) ---
+      // IMPORTANTE: Agregamos 'await' y capturamos el resultado
       if (webMessage?.message) {
-        messageHandler(socket, webMessage);
+        const handlerResult = await messageHandler(socket, webMessage);
+        
+        // Si el handler retorna "BLOCKED", detenemos este mensaje para que no ejecute comandos
+        if (handlerResult === "BLOCKED") {
+          continue; 
+        }
       }
 
       if (isAtLeastMinutesInPast(timestamp)) {
         continue;
       }
 
+      // Lógica de participantes (Añadir/Eliminar)
       if (isAddOrLeave.includes(webMessage.messageStubType)) {
         let action = "";
         if (webMessage.messageStubType === GROUP_PARTICIPANT_ADD) {
@@ -61,12 +69,14 @@ exports.onMessagesUpsert = async ({ socket, messages, startProcess }) => {
           action,
         });
       } else {
+        // Carga de funciones comunes
         const commonFunctions = loadCommonFunctions({ socket, webMessage });
 
         if (!commonFunctions) {
           continue;
         }
 
+        // Lógica de miembros silenciados (Mute)
         if (
           checkIfMemberIsMuted(
             commonFunctions.remoteJid,
@@ -77,13 +87,14 @@ exports.onMessagesUpsert = async ({ socket, messages, startProcess }) => {
             await commonFunctions.deleteMessage(webMessage.key);
           } catch (error) {
             errorLog(
-              `Error al eliminar mensaje de miembro silenciado, ¡probablemente no soy administrador del grupo! ${error.message}`
+              `Error al eliminar mensaje de miembro silenciado: ${error.message}`
             );
           }
-
           return;
         }
 
+        // --- 🚀 EJECUCIÓN DE COMANDOS ---
+        // Si el grupo llegó aquí, es porque pasó el filtro del messageHandler
         await dynamicCommand(commonFunctions, startProcess);
       }
     } catch (error) {
@@ -97,7 +108,6 @@ exports.onMessagesUpsert = async ({ socket, messages, startProcess }) => {
       }
 
       errorLog(`Error al procesar mensaje: ${error.message}`);
-
       continue;
     }
   }

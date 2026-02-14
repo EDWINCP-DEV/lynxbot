@@ -17,10 +17,6 @@ exports.BOT_NUMBER = "7202218042";
 // Solo números, exactamente como aparece en WhatsApp.
 exports.OWNER_NUMBER = "5579436135";
 
-// LID del dueño del bot.
-// Para obtener el LID del dueño del bot, usa el comando <prefijo>get-lid @mencionar o +teléfono del dueño.
-exports.OWNER_LID = "219999999999999@lid";
-
 // Directorio de los comandos
 exports.COMMANDS_DIR = path.join(__dirname, "commands");
 

@@ -1,55 +1,83 @@
-const mongoose = require('mongoose');
-const Client = require('../models/Client'); // Asegúrate de crear este modelo también
-require('dotenv').config(); // Carga las variables del archivo .env
+const fs = require('fs');
+const path = require('path');
+
+const DB_PATH = path.resolve(__dirname, "..", "..", "database", "clients.json");
+
+// --- INICIALIZACIÓN ---
+if (!fs.existsSync(path.dirname(DB_PATH))) fs.mkdirSync(path.dirname(DB_PATH), { recursive: true });
+if (!fs.existsSync(DB_PATH)) fs.writeFileSync(DB_PATH, JSON.stringify([], null, 2));
+
+const readDB = () => {
+    try {
+        const data = fs.readFileSync(DB_PATH, 'utf-8');
+        return JSON.parse(data || "[]");
+    } catch (error) {
+        console.error("❌ Error al leer clients.json:", error.message);
+        return [];
+    }
+};
+
+const writeDB = (data) => fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2));
+
+// --- SERVICIOS ---
+const databaseService = {
+    isGroupAuthorized: async (groupId) => {
+        const clients = readDB();
+        // Verifica si el grupo actual ya está en la lista de algún cliente activo
+        return clients.some(c => c.isActive && c.activeGroups.includes(groupId));
+    },
+
+    authorizeNewGroup: async (userJid, groupId) => {
+        let clients = readDB();
+        
+        // Limpiamos el JID del remitente para tener solo números (ej: 5215579... -> 5215579)
+        const senderNumber = userJid.replace(/\D/g, '');
+
+        // Buscamos al cliente comparando los números de forma flexible
+        const clientIndex = clients.findIndex(c => {
+            if (!c.isActive) return false;
+            const dbNumber = c.phoneNumber.replace(/\D/g, '');
+            // Verifica si el número de la DB está contenido en el JID de WhatsApp
+            return senderNumber.endsWith(dbNumber) || senderNumber.includes(dbNumber);
+        });
+
+        // 1. Si no se encuentra el número en el JSON
+        if (clientIndex === -1) {
+            return { 
+                success: false, 
+                message: "❌ *Acceso Denegado:* Tu número no tiene una suscripción activa en el sistema de Lynx Gaming." 
+            };
+        }
+
+        const client = clients[clientIndex];
+
+        // 2. Si el grupo ya estaba activado
+        if (client.activeGroups.includes(groupId)) {
+            return { success: false, message: "⚠️ *Nota:* Este grupo ya se encuentra autorizado en tu plan." };
+        }
+
+        // 3. Si ya no tiene cupos disponibles
+        if (client.activeGroups.length >= client.maxGroups) {
+            return { 
+                success: false, 
+                message: `🚫 *Límite Alcanzado:* Has agotado tus cupos (${client.activeGroups.length}/${client.maxGroups}). Contacta al soporte para ampliar tu plan.` 
+            };
+        }
+
+        // 4. ÉXITO: Guardamos el nuevo grupo
+        clients[clientIndex].activeGroups.push(groupId);
+        writeDB(clients);
+        
+        return { 
+            success: true, 
+            message: `✅ *¡LynxBot Activado!*\n\nEste grupo ha sido vinculado a la cuenta de: *${client.name}*\nCupos usados: ${clients[clientIndex].activeGroups.length}/${client.maxGroups}` 
+        };
+    }
+};
 
 const connectDB = async () => {
-    try {
-        // Usamos la variable de entorno para seguridad
-        const uri = process.env.MONGO_URI; 
-        
-        if (!uri) {
-            throw new Error("❌ La variable MONGO_URI no está definida en el archivo .env");
-        }
-
-        await mongoose.connect(uri);
-        console.log('🚀 Conexión a MongoDB Atlas exitosa (Clusterlynx)');
-    } catch (err) {
-        console.error('❌ Error al conectar a MongoDB:', err.message);
-        process.exit(1); // Detiene el bot si no hay base de datos
-    }
+    console.log("📁 [Base de Datos] Sistema local (JSON) cargado correctamente.");
+    return true;
 };
 
-const databaseService = {
-    // Buscar un cliente por su número de WhatsApp
-    getClientByNumber: async (phoneNumber) => {
-        return await Client.findOne({ phoneNumber });
-    },
-
-    // Verificar si el grupo actual está en la lista permitida de algún cliente
-    isGroupAuthorized: async (groupId) => {
-        const client = await Client.findOne({ activeGroups: groupId, isActive: true });
-        return !!client;
-    },
-
-    // Registrar un nuevo grupo si el cliente tiene cupo
-    authorizeNewGroup: async (phoneNumber, groupId) => {
-        const client = await Client.findOne({ phoneNumber });
-        
-        if (client && client.isActive) {
-            // Verificar si aún tiene espacio en su plan (ej: 2 de 5 grupos)
-            if (client.activeGroups.length < client.maxGroups) {
-                // Evitar duplicados
-                if (!client.activeGroups.includes(groupId)) {
-                    client.activeGroups.push(groupId);
-                    await client.save();
-                    return { success: true, message: "Grupo autorizado con éxito" };
-                }
-                return { success: false, message: "Este grupo ya estaba autorizado" };
-            }
-            return { success: false, message: "Has alcanzado el límite de grupos de tu plan" };
-        }
-        return { success: false, message: "No tienes una membresía activa" };
-    }
-};
-
-module.exports = { connectDB, databaseService };
+module.exports = { databaseService, connectDB };
